@@ -1,3 +1,11 @@
-body {
-  margin: 0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.full-body {
+  @apply w-screen h-screen;
+}
+
+.center-flex {
+  @apply flex justify-center items-center;
 }

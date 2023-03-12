@@ -1,16 +1,9 @@
-import { useEffect } from "react";
-import Class from "./pages/class";
-import Functional from "./pages/functional";
+import ScreenPage from "./pages/screen/Home";
 
 function App() {
   return (
     <>
-      <div>Hello World App</div>
-      <br />
-      <Class />
-      <br />
-      <br />
-      <Functional />
+      <ScreenPage />
     </>
   );
 }
