@@ -1,9 +1,9 @@
-import ScreenSignInPage from "./SignIn";
+import SignInPage from "./login/SignIn";
 
 function ScreenPage() {
   return (
     <>
-      <ScreenSignInPage />
+      <SignInPage />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import ScreenPage from "./pages/screen/Home";
+import ScreenPage from "./pages/screen/Screen";
 
 function App() {
   return (
