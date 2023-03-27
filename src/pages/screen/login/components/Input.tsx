@@ -1,23 +1,31 @@
-import { forwardRef } from "react";
+import {
+  FieldErrors,
+  FieldValues,
+  Path,
+  RegisterOptions,
+  UseFormRegister,
+} from "react-hook-form";
 
-interface props {
+interface props<T extends FieldValues> {
   label: string;
-  name?: string;
+  name: Path<T>;
   type?: React.HTMLInputTypeAttribute;
+  options?: RegisterOptions<FieldValues, string>;
+  errors?: FieldErrors<T>;
+  register: UseFormRegister<T>;
 }
 
-type refType = React.LegacyRef<HTMLInputElement>;
-
-const InputTSX = forwardRef((props: props, ref: refType) => {
-  const { label, name, type } = props;
+function InputTSX<T extends FieldValues>(props: props<T>) {
+  const { label, name, type, options, errors, register } = props;
 
   return (
     <>
       <div className="relative">
         <input
+          {...register(name, options)}
           name={name}
-          ref={ref}
-          type={type ? type : "text"}
+          type={type ?? "text"}
+          autoComplete="off"
           className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-transparent rounded-lg border border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
           placeholder=" "
         />
@@ -25,8 +33,13 @@ const InputTSX = forwardRef((props: props, ref: refType) => {
           {label}
         </label>
       </div>
+      {errors && errors[name] && (
+        <div className="text-start text-red-500">
+          {errors[name]?.message?.toString()}
+        </div>
+      )}
     </>
   );
-});
+}
 
 export default InputTSX;

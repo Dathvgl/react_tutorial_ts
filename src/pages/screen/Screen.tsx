@@ -1,9 +1,11 @@
 import SignInPage from "./login/SignIn";
+import SignUpPage from "./login/SignUp";
 
 function ScreenPage() {
   return (
     <>
-      <SignInPage />
+      {/* <SignInPage /> */}
+      <SignUpPage />
     </>
   );
 }
