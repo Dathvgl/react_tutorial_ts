@@ -1,9 +1,9 @@
-import ScreenPage from "./pages/screen/Screen";
+import LayoutHome from "./layouts/LayoutHome";
 
 function App() {
   return (
     <>
-      <ScreenPage />
+      <LayoutHome />
     </>
   );
 }
