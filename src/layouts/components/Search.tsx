@@ -1,50 +1,57 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { BsSearch } from "react-icons/bs";
-import Brh from "../../components/Brh";
+import Brh from "~/components/Brh";
+import { DropAbsolute } from "~/components/Drop";
 
 function SearchHome() {
-  const [slider, setSlider] = useState(false);
+  const [state, setState] = useState(false);
 
-  const ref = useRef<HTMLDivElement | null>(null);
+  const ref = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    function handleClick(event: MouseEvent) {
-      if (event && !ref.current?.contains(event.target as HTMLElement)) {
-        setSlider(() => false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClick);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-    };
-  }, []);
-
-  function inputClick(event: React.MouseEvent<HTMLElement>) {
+  function onClick(event: React.MouseEvent<HTMLElement>) {
     event.preventDefault();
-    setSlider(() => true);
+    setState(() => true);
+  }
+
+  function init() {
+    ref.current?.focus();
+  }
+
+  function callback() {
+    setState(() => false);
   }
 
   return (
     <>
       <div className="relative">
-        <div
-          ref={ref}
-          className={`p-3 bg-sky-400 ${slider ? "rounded-t-3xl" : "rounded-3xl"}`}
-        >
+        <div className="p-3 w-96 bg-black bg-opacity-20 rounded-3xl">
           <div className="flex items-center">
-            <BsSearch size={20} />
+            <BsSearch size={15} />
             <Brh />
-            <input
-              className="bg-transparent placeholder-white outline-0"
-              onClick={inputClick}
-              placeholder="Search"
-            />
-          </div>
-          {slider && (
-            <div className="absolute p-3 left-0 bg-inherit w-full rounded-b-3xl">
-              <div>Test</div>
+            <div className="flex-1 cursor-text" onClick={onClick}>
+              Tìm kiếm
             </div>
+          </div>
+          {state && (
+            <DropAbsolute
+              className="w-full p-3 bg-sky-500 left-0 top-0  rounded-3xl"
+              init={init}
+              callback={callback}
+            >
+              <div className="flex items-center">
+                <BsSearch size={15} />
+                <Brh />
+                <input
+                  ref={ref}
+                  className="bg-transparent placeholder-white outline-0 flex-1"
+                  placeholder="Tìm kiếm"
+                />
+              </div>
+              <br />
+              <div className="w-full p-2 bg-black bg-opacity-30 rounded-lg">
+                Haha
+              </div>
+            </DropAbsolute>
           )}
         </div>
       </div>

@@ -1,12 +1,14 @@
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, useState } from "react";
 import { PlacesType, Tooltip } from "react-tooltip";
+import { DropAbsolute } from "./Drop";
 
 type Props = {
   id?: string;
   children?: React.ReactNode;
   content?: React.ReactNode;
   place?: PlacesType;
-  onClick?: MouseEventHandler<HTMLDivElement>;
+  disable?: boolean;
+  onClick?: MouseEventHandler<HTMLElement>;
 };
 
 export function CircleIcon(props: Props) {
@@ -30,8 +32,9 @@ export function CircleIcon(props: Props) {
 }
 
 export function HoverCircleIcon(props: Props) {
-  const { id, children, content, place, onClick } = props;
+  const { id, children, content, place, disable, onClick } = props;
   const idStr = id ?? "hover-circle-icon";
+  const disableBool = disable ?? false;
 
   return (
     <>
@@ -43,9 +46,55 @@ export function HoverCircleIcon(props: Props) {
       >
         {children}
       </div>
-      <Tooltip anchorSelect={`#${idStr}`} place={place}>
-        {content ?? "Tool Tip"}
-      </Tooltip>
+      {!disableBool && (
+        <Tooltip anchorSelect={`#${idStr}`} place={place}>
+          {content ?? "Tool Tip"}
+        </Tooltip>
+      )}
+    </>
+  );
+}
+
+type DropIconType = typeof CircleIcon | typeof HoverCircleIcon;
+
+type DropProps = Props & {
+  icon?: React.ReactNode;
+  iconType?: DropIconType;
+  className?: string;
+  init?: () => void;
+};
+
+export function DropIcon(props: DropProps) {
+  const { icon, iconType, children, className, onClick, init, ...rest } = props;
+
+  const [state, setState] = useState(false);
+
+  function onClickDrop(event: React.MouseEvent<HTMLElement>) {
+    event.preventDefault();
+    onClick?.(event);
+    setState(() => true);
+  }
+
+  function callback() {
+    setState(() => false);
+  }
+
+  return (
+    <>
+      {iconType && (
+        <div className="relative">
+          {state && (
+            <DropAbsolute className={className} init={init} callback={callback}>
+              {children}
+            </DropAbsolute>
+          )}
+          {iconType({
+            ...rest,
+            onClick: onClickDrop,
+            children: <>{icon}</>,
+          })}
+        </div>
+      )}
     </>
   );
 }
