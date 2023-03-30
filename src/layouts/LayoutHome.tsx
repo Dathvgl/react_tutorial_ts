@@ -3,6 +3,7 @@ import FooterHome from "./components/FooterHome";
 import SideLeftHome from "./components/SideLeftHome";
 import SideRightHome from "./components/SideRightHome";
 import { Outlet } from "react-router-dom";
+import { MusicProvider } from "~/contexts/Music";
 
 function LayoutHome() {
   return (
@@ -18,7 +19,9 @@ function LayoutHome() {
             </div>
           </div>
         </div>
-        <FooterHome />
+        <MusicProvider>
+          <FooterHome />
+        </MusicProvider>
       </div>
     </>
   );

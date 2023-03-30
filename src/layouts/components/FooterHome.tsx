@@ -1,4 +1,5 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import {
   AiOutlineHeart,
   AiOutlineStepBackward,
@@ -20,9 +21,14 @@ import {
 import { Link } from "react-router-dom";
 import Brh from "~/components/Brh";
 import { DropIcon, HoverCircleIcon } from "~/components/Icon";
+import { MusicContext } from "~/contexts/Music";
+import { MusicContextType, MusicStateType } from "~/types";
 
 function VolumePlayer() {
-  const [volume, setVolume] = useState(60);
+  const {
+    music: { volume },
+    setMusic,
+  } = useContext(MusicContext) as MusicContextType;
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -40,7 +46,11 @@ function VolumePlayer() {
         }
 
         const range = Number.parseInt(ref.current.value);
-        setVolume(() => range);
+
+        setMusic((state: MusicStateType) => ({
+          ...state,
+          volume: range / 100,
+        }));
       }
     };
 
@@ -52,7 +62,12 @@ function VolumePlayer() {
   }, []);
 
   function onChange(event: ChangeEvent<HTMLInputElement>) {
-    setVolume(() => Number.parseInt(event.target.value));
+    const range = Number.parseInt(event.target.value);
+
+    setMusic((state: MusicStateType) => ({
+      ...state,
+      volume: range / 100,
+    }));
   }
 
   return (
@@ -77,7 +92,7 @@ function VolumePlayer() {
         min={0}
         max={100}
         onChange={onChange}
-        value={volume}
+        value={volume * 100}
         className="w-16"
       />
     </>
@@ -106,39 +121,40 @@ function RandomPlayer() {
 }
 
 function LoopPlayer() {
-  type LoopType = "off" | "all" | "one";
-
-  const [state, setState] = useState<LoopType>("off");
+  const {
+    music: { loop },
+    setMusic,
+  } = useContext(MusicContext) as MusicContextType;
 
   return (
     <>
-      {state == "off" && (
+      {loop == "off" && (
         <HoverCircleIcon
           id="play-loop-all"
           onClick={() => {
-            setState(() => "all");
+            setMusic((state: MusicStateType) => ({ ...state, loop: "all" }));
           }}
           content="Bật phát lại tất cả"
         >
           <BsRepeat size={20} />
         </HoverCircleIcon>
       )}
-      {state == "all" && (
+      {loop == "all" && (
         <HoverCircleIcon
           id="play-loop-all"
           onClick={() => {
-            setState(() => "one");
+            setMusic((state: MusicStateType) => ({ ...state, loop: "one" }));
           }}
           content="Bật phát lại tất cả"
         >
           <BsRepeat size={20} className="text-sky-500" />
         </HoverCircleIcon>
       )}
-      {state == "one" && (
+      {loop == "one" && (
         <HoverCircleIcon
           id="play-loop-one"
           onClick={() => {
-            setState(() => "off");
+            setMusic((state: MusicStateType) => ({ ...state, loop: "off" }));
           }}
           content="Tắt phát lại"
         >
@@ -150,19 +166,25 @@ function LoopPlayer() {
 }
 
 function ActivePlayer() {
-  const [state, setState] = useState(false);
+  const {
+    music: { played },
+    setMusic,
+  } = useContext(MusicContext) as MusicContextType;
 
   const className = "cursor-pointer select-none";
 
   return (
     <>
-      {state ? (
+      {played ? (
         <>
           <BsPauseCircle
             size={30}
             className={className}
             onClick={() => {
-              setState(() => false);
+              setMusic((state: MusicStateType) => ({
+                ...state,
+                played: false,
+              }));
             }}
           />
         </>
@@ -172,11 +194,65 @@ function ActivePlayer() {
             size={30}
             className={className}
             onClick={() => {
-              setState(() => true);
+              setMusic((state: MusicStateType) => ({
+                ...state,
+                played: true,
+              }));
             }}
           />
         </>
       )}
+    </>
+  );
+}
+
+function TimelinePlayer() {
+  const {
+    music: { audio },
+  } = useContext(MusicContext) as MusicContextType;
+
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    audio.onloadedmetadata = () => {
+      setDuration(() => audio.duration);
+    };
+
+    audio.ontimeupdate = () => {
+      setTime(() => audio.currentTime);
+    };
+  }, [audio]);
+
+  function timeLine(millis: number) {
+    var minutes = Math.floor(millis / 60);
+    var seconds = ((millis % 60) / 1).toFixed(0);
+    return `${(minutes < 10 ? "0" : "") + minutes}:${
+      Number.parseInt(seconds) < 10 ? "0" : ""
+    }${seconds}`;
+  }
+
+  function onChange(event: ChangeEvent<HTMLInputElement>) {
+    const range = Number.parseFloat(event.target.value);
+    audio.currentTime = range;
+  }
+
+  return (
+    <>
+      <div className="flex items-center">
+        <div>{timeLine(time)}</div>
+        <Brh />
+        <input
+          className="w-96"
+          type="range"
+          value={time}
+          min={0}
+          max={duration}
+          onChange={onChange}
+        />
+        <Brh />
+        <div>{timeLine(duration)}</div>
+      </div>
     </>
   );
 }
@@ -214,13 +290,7 @@ function MediaPlayer() {
           <Brh />
           <LoopPlayer />
         </div>
-        <div className="flex items-center">
-          <div>00:00</div>
-          <Brh />
-          <input className="w-96" type="range" min={0} max={100} />
-          <Brh />
-          <div>00:00</div>
-        </div>
+        <TimelinePlayer />
       </div>
     </>
   );
@@ -272,5 +342,7 @@ function FooterHome() {
     </>
   );
 }
+
+// https://mp3-s1-zmp3.zmdcdn.me/577fc5e4a5a04cfe15b1/2306389018076181266?authen=exp=1680281342~ac~acl=/577fc5e4a5a04cfe15b1/*~hmac=d5027a686414a56b10594c036219adf4&fs=MTY4MDEwODU0MjM0NHx3ZWJWNnwxMDQyNDjQ0M1MjQ0fDExMy4yMy4xMTUdUngNjk
 
 export default FooterHome;

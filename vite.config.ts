@@ -7,7 +7,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "~": "./src",
+      types: "./src/types.d.ts",
       layouts: "./src/layouts",
+      contexts: "./src/contexts",
       components: "./src/components",
     },
   },
