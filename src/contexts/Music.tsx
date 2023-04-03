@@ -1,46 +1,110 @@
-import { createContext, useEffect, useState } from "react";
-import { MusicContextType, MusicStateType } from "~/types";
+import {
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import {
+  ChildrenProps,
+  MusicContextType,
+  MusicStateType,
+  SupportStateType,
+} from "~/types";
 import song from "../song.mp3";
+import axios from "axios";
+import { server } from "~/App";
+import useAudio from "~/hooks/Audio";
+import { useSupportContext } from "./Support";
 
-export const MusicContext = createContext<MusicContextType | null>(null);
+type ResType = {
+  err: number;
+  msg: string;
+  data: MusicType;
+};
 
-export const MusicProvider = ({ children }: { children: React.ReactNode }) => {
-  const audio = new Audio(song);
+type MusicType = {
+  128: string;
+  320?: string;
+};
+
+type Props = ChildrenProps & {
+  isPlay: boolean;
+  songId: string[];
+  songIndex: number;
+  setSupport(value: SetStateAction<SupportStateType>): void;
+};
+
+export function useMusicContext() {
+  const context = useContext(MusicContext);
+
+  if (!context) throw new Error("Music context null");
+  return context;
+}
+
+export const MusicContext = createContext<MusicContextType>(null!);
+
+export const MusicProvider = (props: Props) => {
+  const { children, isPlay, songId, songIndex, setSupport } = props;
+  const { audio, srcStr, srcBlob, volume, played } = useAudio();
 
   const [music, setMusic] = useState<MusicStateType>({
     audio: audio,
-    played: false,
-    volume: 0.2,
+    played: isPlay,
+    volume: 0.1,
     loop: "off",
   });
 
   useEffect(() => {
-    music.audio.volume = music.volume;
-  }, [music.audio]);
+    audio.onended = () => {
+      if (songId.length > songIndex) {
+        setSupport((state: SupportStateType) => ({
+          ...state,
+          songIndex: state.songIndex + 1,
+        }));
+      } else {
+        setSupport((state: SupportStateType) => ({
+          ...state,
+          isPlay: false,
+        }));
+      }
+    };
+
+    if (songId.length != 0 && songId.length > songIndex) {
+      init(songId[songIndex]);
+    }
+
+    console.log(songIndex);
+  }, [songIndex]);
 
   useEffect(() => {
-    music.audio.volume = music.volume;
+    volume(music.volume);
   }, [music.volume]);
 
   useEffect(() => {
-    musicPlayed(music.played);
+    played(music.played);
   }, [music.played]);
 
-  useEffect(() => {
-    switch (music.loop) {
-      case "off":
-        music.audio.loop = false;
-        break;
-      case "all":
-      case "one":
-        music.audio.loop = true;
-        break;
-    }
-  }, [music.loop]);
+  // useEffect(() => {
+  //   switch (music.loop) {
+  //     case "off":
+  //       music.audio.loop = false;
+  //       break;
+  //     case "all":
+  //     case "one":
+  //       music.audio.loop = true;
+  //       break;
+  //   }
+  // }, [music.loop]);
 
-  async function musicPlayed(played: boolean) {
-    if (played) await music.audio.play();
-    else music.audio.pause();
+  async function init(id: string) {
+    const res = await axios.get(`${server}/zing/song/${id}`);
+    const data: ResType = res.data;
+    if (data.err == 0) {
+      const file = await axios.get(data.data[128], { responseType: "blob" });
+      const blob: Blob | MediaSource = file.data;
+      await srcBlob(blob);
+    }
   }
 
   return (

@@ -13,7 +13,7 @@ const classNameDropItem: string =
 function HeaderHome() {
   return (
     <>
-      <div className="px-14 bg-slate-700 sticky top-0 h-16 flex justify-between items-center">
+      <div className="px-14 bg-slate-700 sticky top-0 h-16 flex justify-between items-center z-30">
         <div className="flex items-center">
           <BsArrowLeft size={25} />
           <Brh />

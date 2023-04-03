@@ -5,6 +5,8 @@ import HomePage from "./pages/home/Home";
 import SignInPage from "./pages/login/SignIn";
 import SignUpPage from "./pages/login/SignUp";
 
+export const server: string = import.meta.env.VITE_SERVER;
+
 function App() {
   return (
     <Routes>

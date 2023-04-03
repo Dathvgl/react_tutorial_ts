@@ -2,10 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* body {
+  overflow: hidden;
+} */
+
 .full-body {
   @apply w-screen h-screen;
 }
 
 .center-flex {
   @apply flex justify-center items-center;
+}
+
+.center-absolute {
+  @apply top-0 left-0 right-0 bottom-0 m-auto;
+}
+
+.center-crop {
+  @apply bg-center bg-no-repeat;
 }

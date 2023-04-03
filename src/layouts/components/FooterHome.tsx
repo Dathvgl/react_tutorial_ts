@@ -1,16 +1,10 @@
-import axios from "axios";
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
-import {
-  AiOutlineHeart,
-  AiOutlineStepBackward,
-  AiOutlineStepForward,
-} from "react-icons/ai";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { AiOutlineStepBackward, AiOutlineStepForward } from "react-icons/ai";
 import {
   BsPauseCircle,
   BsPlayCircle,
   BsRepeat,
   BsRepeat1,
-  BsThreeDots,
 } from "react-icons/bs";
 import { FaRandom } from "react-icons/fa";
 import {
@@ -18,17 +12,25 @@ import {
   RiVolumeMuteFill,
   RiVolumeUpFill,
 } from "react-icons/ri";
-import { Link } from "react-router-dom";
 import Brh from "~/components/Brh";
-import { DropIcon, HoverCircleIcon } from "~/components/Icon";
-import { MusicContext } from "~/contexts/Music";
-import { MusicContextType, MusicStateType } from "~/types";
+import { HoverCircleIcon } from "~/components/Icon";
+import { MusicProvider, useMusicContext } from "~/contexts/Music";
+import {
+  MusicStateType,
+  ResZingType,
+  SongsAPIType,
+  SupportStateType,
+} from "~/types";
+import { OtherInfoHome, OtherMoreHome } from "../LayoutHome";
+import { useSupportContext } from "~/contexts/Support";
+import axios from "axios";
+import { server } from "~/App";
 
 function VolumePlayer() {
   const {
     music: { volume },
     setMusic,
-  } = useContext(MusicContext) as MusicContextType;
+  } = useMusicContext();
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -124,7 +126,7 @@ function LoopPlayer() {
   const {
     music: { loop },
     setMusic,
-  } = useContext(MusicContext) as MusicContextType;
+  } = useMusicContext();
 
   return (
     <>
@@ -132,7 +134,10 @@ function LoopPlayer() {
         <HoverCircleIcon
           id="play-loop-all"
           onClick={() => {
-            setMusic((state: MusicStateType) => ({ ...state, loop: "all" }));
+            setMusic((state: MusicStateType) => ({
+              ...state,
+              loop: "all",
+            }));
           }}
           content="Bật phát lại tất cả"
         >
@@ -143,7 +148,10 @@ function LoopPlayer() {
         <HoverCircleIcon
           id="play-loop-all"
           onClick={() => {
-            setMusic((state: MusicStateType) => ({ ...state, loop: "one" }));
+            setMusic((state: MusicStateType) => ({
+              ...state,
+              loop: "one",
+            }));
           }}
           content="Bật phát lại tất cả"
         >
@@ -154,7 +162,10 @@ function LoopPlayer() {
         <HoverCircleIcon
           id="play-loop-one"
           onClick={() => {
-            setMusic((state: MusicStateType) => ({ ...state, loop: "off" }));
+            setMusic((state: MusicStateType) => ({
+              ...state,
+              loop: "off",
+            }));
           }}
           content="Tắt phát lại"
         >
@@ -169,9 +180,16 @@ function ActivePlayer() {
   const {
     music: { played },
     setMusic,
-  } = useContext(MusicContext) as MusicContextType;
+  } = useMusicContext();
 
   const className = "cursor-pointer select-none";
+
+  function onClick(value: boolean) {
+    setMusic((state: MusicStateType) => ({
+      ...state,
+      played: value,
+    }));
+  }
 
   return (
     <>
@@ -180,12 +198,7 @@ function ActivePlayer() {
           <BsPauseCircle
             size={30}
             className={className}
-            onClick={() => {
-              setMusic((state: MusicStateType) => ({
-                ...state,
-                played: false,
-              }));
-            }}
+            onClick={() => onClick(false)}
           />
         </>
       ) : (
@@ -193,12 +206,7 @@ function ActivePlayer() {
           <BsPlayCircle
             size={30}
             className={className}
-            onClick={() => {
-              setMusic((state: MusicStateType) => ({
-                ...state,
-                played: true,
-              }));
-            }}
+            onClick={() => onClick(true)}
           />
         </>
       )}
@@ -209,7 +217,11 @@ function ActivePlayer() {
 function TimelinePlayer() {
   const {
     music: { audio },
-  } = useContext(MusicContext) as MusicContextType;
+  } = useMusicContext();
+
+  const {
+    support: { songId },
+  } = useSupportContext();
 
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -222,7 +234,7 @@ function TimelinePlayer() {
     audio.ontimeupdate = () => {
       setTime(() => audio.currentTime);
     };
-  }, [audio]);
+  }, [songId]);
 
   function timeLine(millis: number) {
     var minutes = Math.floor(millis / 60);
@@ -296,53 +308,58 @@ function MediaPlayer() {
   );
 }
 
-const classNameDropItem: string =
-  "p-2 hover:bg-black hover:bg-opacity-20 rounded";
+type ResType = ResZingType & {
+  data: SongsAPIType;
+};
 
 function FooterHome() {
+  const { support, setSupport } = useSupportContext();
+
+  const [info, setInfo] = useState<SongsAPIType | null>(null);
+
+  useEffect(() => {
+    init();
+  }, [support.songIndex]);
+
+  async function init() {
+    const id = support.songId[support.songIndex];
+    const res = await axios.get(`${server}/zing/info-song/${id}`);
+    const data: ResType = res.data;
+    if (data.err == 0) setInfo(() => data.data);
+  }
+
   return (
     <>
-      <div className="h-24 p-4 text-white bg-slate-800 flex justify-between items-center">
-        <div className="flex justify-between items-center">
-          <img src="" alt="Error" />
-          <Brh />
-          <div>
-            <div>Name</div>
-            <div>Author</div>
+      {support.songId.length != 0 && (
+        <div className="h-24 p-4 flex-none text-white bg-slate-800 flex justify-between items-center select-none">
+          <div className="flex items-center">
+            {info && <OtherInfoHome item={info} />}
+            <Brh />
+            <OtherMoreHome position="left-0 bottom-14" />
           </div>
-          <Brh />
-          <HoverCircleIcon id="heart" content="Thêm/Xóa khỏi thư viện">
-            <AiOutlineHeart size={20} />
-          </HoverCircleIcon>
-          <Brh />
-          <DropIcon
-            id="more"
-            content="Xem thêm"
-            icon={<BsThreeDots size={20} />}
-            iconType={HoverCircleIcon}
-            className="left-0 bottom-14 w-60 bg-slate-700 rounded-lg p-2 flex flex-col"
-          >
-            <Link className={classNameDropItem} to={"/login/signUp"}>
-              Đăng ký
-            </Link>
-            <Link className={classNameDropItem} to={"/login/signIn"}>
-              Đăng nhập
-            </Link>
-          </DropIcon>
+          <MusicProvider {...support} setSupport={setSupport}>
+            <MediaPlayer />
+            <div className="flex justify-between items-center">
+              <VolumePlayer />
+              <Brh />
+              <HoverCircleIcon
+                id="list-song"
+                disable
+                onClick={() => {
+                  setSupport((state: SupportStateType) => ({
+                    ...state,
+                    sideRight: !support.sideRight,
+                  }));
+                }}
+              >
+                <RiPlayListLine size={20} />
+              </HoverCircleIcon>
+            </div>
+          </MusicProvider>
         </div>
-        <MediaPlayer />
-        <div className="flex justify-between items-center">
-          <VolumePlayer />
-          <Brh />
-          <HoverCircleIcon id="list-song" disable>
-            <RiPlayListLine size={20} />
-          </HoverCircleIcon>
-        </div>
-      </div>
+      )}
     </>
   );
 }
-
-// https://mp3-s1-zmp3.zmdcdn.me/577fc5e4a5a04cfe15b1/2306389018076181266?authen=exp=1680281342~ac~acl=/577fc5e4a5a04cfe15b1/*~hmac=d5027a686414a56b10594c036219adf4&fs=MTY4MDEwODU0MjM0NHx3ZWJWNnwxMDQyNDjQ0M1MjQ0fDExMy4yMy4xMTUdUngNjk
 
 export default FooterHome;

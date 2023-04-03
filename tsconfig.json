@@ -18,6 +18,7 @@
     "paths": {
       "~/*": ["./src/*"],
       "types": ["./src/types.d.ts"],
+      "hooks/*": ["./src/hooks/*"],
       "layouts/*": ["./src/layouts/*"],
       "contexts/*": ["./src/contexts/*"],
       "components/*": ["./src/components/*"]
