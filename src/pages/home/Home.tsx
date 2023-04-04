@@ -28,10 +28,11 @@ function HomePage() {
   async function init() {
     const res = await axios.get(`${server}/zing/home`);
     const data: ResType = res.data;
-    console.log(data.data.items);
+
     state.find((item) => {
       return item?.sectionId && item?.sectionType;
     });
+
     if (data.err == 0) setState(() => data.data.items);
   }
 

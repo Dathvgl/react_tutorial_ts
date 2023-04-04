@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router-dom";
 import "react-tooltip/dist/react-tooltip.css";
 import App from "./App";
 import "./index.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   // <StrictMode>

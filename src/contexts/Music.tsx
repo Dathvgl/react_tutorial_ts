@@ -46,35 +46,37 @@ export const MusicContext = createContext<MusicContextType>(null!);
 
 export const MusicProvider = (props: Props) => {
   const { children, isPlay, songId, songIndex, setSupport } = props;
-  const { audio, srcStr, srcBlob, volume, played } = useAudio();
+  const { audio, srcBlob, volume, played } = useAudio();
 
   const [music, setMusic] = useState<MusicStateType>({
     audio: audio,
-    played: isPlay,
     volume: 0.1,
     loop: "off",
   });
 
   useEffect(() => {
     audio.onended = () => {
-      if (songId.length > songIndex) {
+      if (songId.length == songIndex + 1 && songIndex != -1) {
         setSupport((state: SupportStateType) => ({
           ...state,
-          songIndex: state.songIndex + 1,
+          isPlay: false,
+          songIndex: 0,
         }));
       } else {
         setSupport((state: SupportStateType) => ({
           ...state,
-          isPlay: false,
+          songIndex: state.songIndex + 1,
         }));
       }
     };
 
-    if (songId.length != 0 && songId.length > songIndex) {
+    // if (songIndex == 0 && music.loop == "all") {
+    //   init(songId[songIndex]);
+    // }
+
+    if (songId.length != 0) {
       init(songId[songIndex]);
     }
-
-    console.log(songIndex);
   }, [songIndex]);
 
   useEffect(() => {
@@ -82,20 +84,8 @@ export const MusicProvider = (props: Props) => {
   }, [music.volume]);
 
   useEffect(() => {
-    played(music.played);
-  }, [music.played]);
-
-  // useEffect(() => {
-  //   switch (music.loop) {
-  //     case "off":
-  //       music.audio.loop = false;
-  //       break;
-  //     case "all":
-  //     case "one":
-  //       music.audio.loop = true;
-  //       break;
-  //   }
-  // }, [music.loop]);
+    played(isPlay);
+  }, [isPlay]);
 
   async function init(id: string) {
     const res = await axios.get(`${server}/zing/song/${id}`);
@@ -104,6 +94,11 @@ export const MusicProvider = (props: Props) => {
       const file = await axios.get(data.data[128], { responseType: "blob" });
       const blob: Blob | MediaSource = file.data;
       await srcBlob(blob);
+
+      setSupport((state: SupportStateType) => ({
+        ...state,
+        isPlay: true,
+      }));
     }
   }
 

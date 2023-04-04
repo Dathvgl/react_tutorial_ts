@@ -100,7 +100,7 @@ function SearchItemHome(props: { data: SongsAPIType[] }) {
             <Brh />
             <div className="hidden group-hover:block">
               <div className="flex justify-between items-center">
-                <OtherMoreHome position="top-14 left-0" />
+                <OtherMoreHome position="top-14 left-0" item={item} />
               </div>
             </div>
           </div>

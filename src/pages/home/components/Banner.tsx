@@ -1,3 +1,6 @@
+import { Fragment } from "react";
+import Slider from "react-slick";
+
 type BannerType = {
   sectionId: string;
   sectionTyoe: string;
@@ -26,16 +29,17 @@ function BannerHome(props: { data?: unknown | undefined }) {
   }
 
   const { items } = data as BannerType;
-  const item = items[0];
+
   return (
     <>
-      <div className="relative">
-        <div className="absolute"></div>
-        <div className="flex justify-between">
-          <BannerItem item={item} />
-          <BannerItem item={item} />
-          <BannerItem item={item} />
-        </div>
+      <div className="grid grid-cols-1">
+        <Slider infinite centerMode speed={500} slidesToShow={3} slidesToScroll={1}>
+          {items.map((item, index) => (
+            <Fragment key={index}>
+              <BannerItem item={item} />
+            </Fragment>
+          ))}
+        </Slider>
       </div>
     </>
   );
@@ -47,7 +51,7 @@ function BannerItem(props: { item: BannerItemType }) {
   return (
     <>
       <img
-        className="rounded-lg w-72 center-crop"
+        className="rounded-lg w-60 center-crop"
         src={item.banner}
         alt="Error"
       />

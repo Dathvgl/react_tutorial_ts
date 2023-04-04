@@ -178,22 +178,22 @@ function LoopPlayer() {
 
 function ActivePlayer() {
   const {
-    music: { played },
-    setMusic,
-  } = useMusicContext();
+    support: { isPlay },
+    setSupport,
+  } = useSupportContext();
 
   const className = "cursor-pointer select-none";
 
   function onClick(value: boolean) {
-    setMusic((state: MusicStateType) => ({
+    setSupport((state: SupportStateType) => ({
       ...state,
-      played: value,
+      isPlay: value,
     }));
   }
 
   return (
     <>
-      {played ? (
+      {isPlay ? (
         <>
           <BsPauseCircle
             size={30}
@@ -335,7 +335,7 @@ function FooterHome() {
           <div className="flex items-center">
             {info && <OtherInfoHome item={info} />}
             <Brh />
-            <OtherMoreHome position="left-0 bottom-14" />
+            {info && <OtherMoreHome position="left-0 bottom-14" item={info} />}
           </div>
           <MusicProvider {...support} setSupport={setSupport}>
             <MediaPlayer />

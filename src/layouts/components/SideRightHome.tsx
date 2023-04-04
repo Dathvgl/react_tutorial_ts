@@ -87,7 +87,7 @@ function SideRightItem(props: { data: string }) {
         {info && <OtherInfoHome item={info} />}
         <div className="hidden group-hover:block">
           <div className="flex justify-between items-center">
-            <OtherMoreHome position="right-14 top-0" />
+            {info && <OtherMoreHome position="right-14 top-0" item={info} />}
           </div>
         </div>
       </div>

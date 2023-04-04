@@ -1,4 +1,4 @@
-import { MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { PlacesType, Tooltip } from "react-tooltip";
 import { DropAbsolute } from "./Drop";
 
@@ -69,10 +69,25 @@ export function DropIcon(props: DropProps) {
 
   const [state, setState] = useState(false);
 
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClick(event: MouseEvent) {
+      if (!ref.current?.contains(event.target as HTMLElement)) {
+        setState(() => false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, []);
+
   function onClickDrop(event: React.MouseEvent<HTMLElement>) {
     event.preventDefault();
     onClick?.(event);
-    setState(() => true);
+    setState(() => !state);
   }
 
   function callback() {
@@ -82,12 +97,15 @@ export function DropIcon(props: DropProps) {
   return (
     <>
       {iconType && (
-        <div className="relative">
-          {state && (
-            <DropAbsolute className={className} init={init} callback={callback}>
-              {children}
-            </DropAbsolute>
-          )}
+        <div ref={ref} className="relative">
+          <DropIconItem
+            className={className}
+            state={state}
+            init={init}
+            callback={callback}
+          >
+            {children}
+          </DropIconItem>
           {iconType({
             ...rest,
             onClick: onClickDrop,
@@ -95,6 +113,34 @@ export function DropIcon(props: DropProps) {
           })}
         </div>
       )}
+    </>
+  );
+}
+
+type AbsoluteProps = {
+  state: boolean;
+  children?: React.ReactNode;
+  className?: string;
+  init?: () => void;
+  callback?: () => void;
+};
+
+function DropIconItem(props: AbsoluteProps) {
+  const { state, children, className, init, callback } = props;
+
+  useEffect(() => {
+    init?.();
+  }, []);
+
+  return (
+    <>
+      <div
+        className={`absolute ${className} ${
+          state ? "opacity-1 visible" : "opacity-0 invisible"
+        }`}
+      >
+        {children}
+      </div>
     </>
   );
 }

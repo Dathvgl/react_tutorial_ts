@@ -16,7 +16,6 @@ export type SupportProviderType = {
 
 export type MusicStateType = {
   audio: HTMLAudioElement;
-  played: boolean;
   volume: number;
   loop: LoopType;
 };
@@ -40,6 +39,7 @@ export type SongsAPIType = {
   allowAudioAds?: boolean;
   artists?: ArtistAPIType[];
   artistsNames?: string;
+  comment?: number;
   downloadPrivileges?: number[];
   duration?: number;
   encodeId?: string;
@@ -50,10 +50,14 @@ export type SongsAPIType = {
   isOffical?: boolean;
   isPrivate?: boolean;
   isWorldWide?: boolean;
+  like?: number;
+  liked?: boolean;
+  listen?: number;
   link?: string;
   mvlink?: string;
   preRelease?: boolean;
   radioId?: number;
+  rakingStatus?: number;
   releaseDate?: number;
   streamingStatus?: number;
   thumbnail?: string;
@@ -69,14 +73,24 @@ export type AlbumAPIType = {
   artistsNames?: string;
   encodeId?: string;
   genreIds?: string[];
-  isIndie?: boolean;
-  isoffical?: boolean;
-  link?: string;
-  releaseDate?: string;
-  releasedAt?: number;
-  sortDescription?: string;
-  thumbnail?: string;
-  title?: string;
+  isAlbum: boolean;
+  isIndie: boolean;
+  isPrivate: boolean;
+  isShuffle: boolean;
+  isSingle: boolean;
+  isoffical: boolean;
+  link: string;
+  playItemMode: number;
+  releaseDate: string;
+  releasedAt: number;
+  sortDescription: string;
+  subType: number;
+  textType: string;
+  thumbnail: string;
+  thumbnailM: string;
+  title: string;
+  uid: number;
+  userName: "Zing MP3";
 };
 
 export type ArtistAPIType = {
@@ -125,4 +139,27 @@ export type HomeFourArtist = {
   thumbnail?: string;
   thumbnailM?: string;
   totalFollow?: number;
+};
+
+export type RTChartType = {
+  chart: RTChartItemType;
+  chartType: string;
+  items: SongsAPIType[];
+  promotes: SongsAPIType[];
+  sectionId: string;
+  sectionType: string;
+};
+
+export type RTChartItemType = {
+  items: {
+    [key: string]: {
+      time: number;
+      hour: string;
+      counter: number;
+    }[];
+  };
+  maxScore: number;
+  minScore: number;
+  times: { hour: string }[];
+  totalScore: number;
 };
