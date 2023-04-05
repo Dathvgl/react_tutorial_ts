@@ -90,6 +90,7 @@ export const MusicProvider = (props: Props) => {
   async function init(id: string) {
     const res = await axios.get(`${server}/zing/song/${id}`);
     const data: ResType = res.data;
+    console.log(data);
     if (data.err == 0) {
       const file = await axios.get(data.data[128], { responseType: "blob" });
       const blob: Blob | MediaSource = file.data;

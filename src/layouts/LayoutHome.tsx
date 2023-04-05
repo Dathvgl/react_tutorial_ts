@@ -145,11 +145,13 @@ export function OtherMoreHome(
           {item.thumbnail && (
             <>
               <div className="mx-2 mt-2 flex item-center">
-                <img
-                  className="w-10 h-10 center-crop rounded-lg"
-                  src={item.thumbnail}
-                  alt="Error"
-                />
+                <div className="center-flex">
+                  <img
+                    className="w-10 h-10 center-crop rounded-lg"
+                    src={item.thumbnail}
+                    alt="Error"
+                  />
+                </div>
                 <div className="ml-2">
                   <div>{item.title}</div>
                   <div className="text-gray-400">
@@ -175,7 +177,8 @@ export function OtherMoreHome(
                     ) : (
                       <>
                         <div className="truncate">
-                          {item.artists?.map(({ name }) => name).join(", ")}
+                          {item.artists?.map(({ name }) => name).join(", ") ??
+                            item.artistsNames}
                         </div>
                       </>
                     )}

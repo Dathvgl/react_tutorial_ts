@@ -104,7 +104,7 @@ function NewReleaseHome(props: { data?: unknown | undefined }) {
                 <div className="flex items-center overflow-hidden">
                   <OtherImageHome id={item.encodeId} url={item.thumbnail} />
                   <div className="ml-2 text-sm min-w-0">
-                    <div className="font-bold">{item.title}</div>
+                    <div className="font-bold truncate">{item.title}</div>
                     <div className="truncate w-4/5">
                       {item.artists.map(({ name }) => name).join(", ")}
                     </div>

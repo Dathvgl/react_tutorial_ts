@@ -15,12 +15,12 @@ export default ({ mode }) => {
     },
     resolve: {
       alias: {
-        "~": "./src",
-        types: "./src/types.d.ts",
-        hooks: "./src/hooks",
-        layouts: "./src/layouts",
-        contexts: "./src/contexts",
-        components: "./src/components",
+        "~": "/src",
+        types: "/src/types.d.ts",
+        hooks: "/src/hooks",
+        layouts: "/src/layouts",
+        contexts: "/src/contexts",
+        components: "/src/components",
       },
     },
     envPrefix: ["VITE_"],
