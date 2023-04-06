@@ -11,11 +11,9 @@ import {
   MusicStateType,
   SupportStateType,
 } from "~/types";
-import song from "../song.mp3";
 import axios from "axios";
 import { server } from "~/App";
 import useAudio from "~/hooks/Audio";
-import { useSupportContext } from "./Support";
 
 type ResType = {
   err: number;
